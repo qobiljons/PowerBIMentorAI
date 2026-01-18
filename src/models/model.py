@@ -22,6 +22,28 @@ def build_content(question: str, answer: str, prompt: str) -> str:
             }}
     """.strip()
 
+def build_visual_content(question: str, prompt: str) -> str:
+        return f"""
+        Instruction:
+        {prompt.strip()}
+        
+        Question:
+        {question.strip()}
+        
+        Use ONLY the provided visual document (PDF or images) to answer.
+        Do NOT rely on prior knowledge.
+        If information is missing, reflect that in the feedback.
+        
+        Return ONLY valid JSON in the following format.
+        DO NOT add explanations, markdown, or extra text.
+        DO NOT wrap in ```.
+        
+        JSON schema:
+        {{
+          "score": number (0-100),
+          "feedback": string
+        }}
+    """.strip()
 
 class Model(ABC):
     def __init__(self):

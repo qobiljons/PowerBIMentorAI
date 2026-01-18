@@ -1,7 +1,9 @@
 import json
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any, Dict, Union
 from google import genai
-from src.models.model import Model, build_content
+from src.models.model import Model, build_content, build_visual_content
+
 
 class Gemini(Model):
     def __init__(self, api_key: str, model_name: str = "gemini-2.5-flash"):
@@ -23,16 +25,41 @@ class Gemini(Model):
         except json.JSONDecodeError as e:
             raise ValueError(f"Model did not return valid JSON.\nRaw output:\n{text}") from e
 
-    # def evaluate_visual(self, question: str, answer: str, prompt: str) -> Dict[str, Any]:
-    #
-    #     response = self.client.models.generate_content(
-    #         model=self.model_name,
-    #         contents=build_content(question, answer, prompt),
-    #     )
-    #
-    #     text = (response.text or "").strip()
-    #
-    #     try:
-    #         return json.loads(text)
-    #     except json.JSONDecodeError as e:
-    #         raise ValueError(f"Model did not return valid JSON.\nRaw output:\n{text}") from e
+
+    def evaluate_visual(
+        self,
+        question: str,
+        prompt: str,
+        pdf_path: Union[str, Path],
+    ) -> Dict[str, Any]:
+        pdf_path = Path(pdf_path)
+        if not pdf_path.is_file() or pdf_path.suffix.lower() != ".pdf":
+            raise ValueError(f"Invalid PDF path: {pdf_path}")
+
+        pdf_bytes = pdf_path.read_bytes()
+
+        contents = [
+            {
+                "text": build_visual_content(question, prompt)
+            },
+            {
+                "inline_data": {
+                    "mime_type": "application/pdf",
+                    "data": pdf_bytes,
+                }
+            },
+        ]
+
+        response = self.client.models.generate_content(
+            model=self.model_name,
+            contents=contents,
+        )
+
+        text = (response.text or "").strip()
+
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            raise ValueError(
+                f"Model did not return valid JSON.\nRaw output:\n{text}"
+            ) from e
