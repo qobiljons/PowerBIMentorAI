@@ -63,3 +63,4 @@ class Gemini(Model):
             raise ValueError(
                 f"Model did not return valid JSON.\nRaw output:\n{text}"
             ) from e
+

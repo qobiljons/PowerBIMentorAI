@@ -1,0 +1,5 @@
+A measure is a calculation that is evaluated at query time based on the current filter context. It is commonly used for aggregations like sums, averages, and ratios, and it changes dynamically when slicers or filters are applied.
+
+A calculated column is computed row by row during data refresh and stored in the model. A measure is calculated on the fly and depends on the filter context of the report visuals.
+
+A star schema is preferred because it improves performance and makes the data model easier to understand and maintain.
