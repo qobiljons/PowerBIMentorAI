@@ -1,7 +1,13 @@
+import sys
+from pathlib import Path
 from pprint import pprint
-from src.models.gemini import Gemini
 import os
 from dotenv import load_dotenv
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
+
+from PowerBIMentor.models.gemini import Gemini
 
 load_dotenv()
 
@@ -15,7 +21,7 @@ question = """
 result = tutor.evaluate_visual(
     question=question,
     prompt="",
-    pdf_path="dashboard.pdf",
+    pdf_path="tests/files/lesson-9/dashboard.pdf",
 )
 
 pprint(result)

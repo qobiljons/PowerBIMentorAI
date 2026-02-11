@@ -1,12 +1,84 @@
+# Environment and secrets
 .env
+.env.*
+!.env.example
 
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.Python
+.python-version
 
+# Type checkers / linters / formatters
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.pyright/
+.dmypy.json
+.mypy.json
+.coverage.*
+coverage.xml
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# Packaging metadata
+*.dist-info/
+
+# Virtual environments
 .venv/
 venv/
 env/
-old.py
+ENV/
+Pipfile.lock
+poetry.lock
+uv.lock
+
+# IDE
 .idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
 .DS_Store
+Thumbs.db
+Icon?
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+.pip-wheel-metadata/
+pip-wheel-metadata/
+wheels/
+sdist/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.benchmarks/
+.pytest_cache/
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+temp/
+*.log
+*.sqlite
+*.sqlite3

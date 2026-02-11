@@ -1,0 +1,6 @@
+# Core dependencies
+google-genai>=1.0.0
+python-dotenv>=1.0.0
+
+# Optional: Vertex AI support
+# google-cloud-aiplatform>=1.0.0

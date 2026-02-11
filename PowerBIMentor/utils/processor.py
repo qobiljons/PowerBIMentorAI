@@ -1,3 +1,5 @@
+"""Power BI template processor for extracting and analyzing metadata."""
+
 import json
 import zipfile
 import tempfile
@@ -8,7 +10,33 @@ from typing import Any, Dict
 
 
 def pbit_to_json(pbit_path: str) -> Dict[str, Any]:
-    p = Path(pbit_path)
+    """Extract and parse DataModelSchema from a Power BI template file.
+
+    Extracts the .pbit file (which is a ZIP), reads the DataModelSchema,
+    handles UTF-16 encoding, and normalizes curly quotes.
+
+    Args:
+        pbit_path: Path to the .pbit file
+
+    Returns:
+        Parsed JSON model as a dictionary
+
+    Raises:
+        ValueError: If the path is invalid or DataModelSchema is not found
+
+    Example:
+        >>> model = pbit_to_json("report.pbit")
+        >>> print(model['model']['tables'])
+    """
+    p = Path(pbit_path).resolve()
+
+    if not p.exists():
+        raise FileNotFoundError(
+            f"PBIT file not found: {pbit_path}\n"
+            f"Resolved to: {p}\n"
+            f"Current working directory: {Path.cwd()}"
+        )
+
     if p.suffix.lower() != ".pbit" or not p.is_file():
         raise ValueError(f"Invalid .pbit path: {pbit_path}")
 
@@ -42,6 +70,31 @@ def pbit_to_json(pbit_path: str) -> Dict[str, Any]:
 
 
 def extract_grading_info(model: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract structured grading information from a Power BI model.
+
+    Extracts tables, columns, measures, relationships, hierarchies, and
+    data sources from the model. Filters out hidden/private items and
+    system-generated objects.
+
+    Args:
+        model: Parsed Power BI model JSON
+
+    Returns:
+        Dictionary containing:
+            - model_name: Name of the model
+            - compatibility_level: Power BI compatibility level
+            - tables: List of table information
+            - measures: List of all measures with expressions
+            - relationships: List of relationships between tables
+            - hierarchies: List of hierarchies
+            - data_source: Data source information (if found)
+            - summary: Aggregated statistics
+
+    Example:
+        >>> model = pbit_to_json("report.pbit")
+        >>> info = extract_grading_info(model)
+        >>> print(f"Total measures: {info['summary']['total_measures']}")
+    """
     model_root = model.get("model") if isinstance(model.get("model"), dict) else model
 
     grading_info: Dict[str, Any] = {
@@ -148,6 +201,21 @@ def extract_grading_info(model: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def generate_grading_report(grading_info: Dict[str, Any]) -> str:
+    """Format grading information into a readable text report.
+
+    Args:
+        grading_info: Structured grading information from extract_grading_info
+
+    Returns:
+        Formatted text report with model details, tables, measures,
+        relationships, hierarchies, and summary statistics
+
+    Example:
+        >>> model = pbit_to_json("report.pbit")
+        >>> info = extract_grading_info(model)
+        >>> report = generate_grading_report(info)
+        >>> print(report)
+    """
     lines = []
 
     lines.append(f"Model: {grading_info.get('model_name')}")
@@ -216,6 +284,24 @@ def generate_grading_report(grading_info: Dict[str, Any]) -> str:
 
 
 def analyze_pbit(pbit_path: str) -> str:
+    """Complete analysis pipeline: extract, analyze, and format Power BI template.
+
+    Convenience function that combines pbit_to_json, extract_grading_info,
+    and generate_grading_report into a single call.
+
+    Args:
+        pbit_path: Path to the .pbit file
+
+    Returns:
+        Formatted text report of the Power BI model
+
+    Raises:
+        ValueError: If the .pbit file is invalid
+
+    Example:
+        >>> report = analyze_pbit("report.pbit")
+        >>> print(report)
+    """
     schema = pbit_to_json(pbit_path)
     grading_info = extract_grading_info(schema)
     report = generate_grading_report(grading_info)
